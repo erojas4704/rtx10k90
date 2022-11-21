@@ -1,8 +1,10 @@
-const world = "world";
+import { Camera } from "./camera";
+import { Vector3 } from "./math";
 
-export function hello(who: string = world): string {
-  return `Hello ${who}! `;
-}
+const camera = new Camera();
+camera.rotation = new Vector3(0, 0, 1);
 
-console.log(hello("world"));
-console.log("Why");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Ready");
+  document.append(`<P> why won't you work </P>`)
+});
