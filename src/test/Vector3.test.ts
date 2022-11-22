@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Vector3 } from "../math";
+import { Vector3 } from "../Vector3";
 
 describe("Vector3 math is accurate", () => {
   it("calculates the magnitude of a vector", () => {

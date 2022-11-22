@@ -1,4 +1,4 @@
-import { Vector3 } from "./math";
+import { Vector3 } from "./Vector3";
 
 export class Entity {
   public position: Vector3 = new Vector3();
