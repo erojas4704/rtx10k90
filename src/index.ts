@@ -8,3 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Ready");
   document.append(`<P> why won't you work </P>`)
 });
+
+const ass = 5;
+export default ass;
