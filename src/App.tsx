@@ -4,12 +4,26 @@ import "./App.css";
 
 import { Camera } from "./camera";
 import { Vector3 } from "./Vector3";
-import { Sphere } from "./Primitives";
+import { Plane, Sphere } from "./Primitives";
 import { Light } from "./Light";
 
 const sphere = new Sphere();
+
 const light = new Light();
 const light2 = new Light();
+
+const plane = new Plane();
+plane.position.z = 10;
+
+const plane2 = new Plane();
+plane2.position.y = 10;
+plane2.position.z = 10;
+
+const plane3 = new Plane();
+plane3.position.y = -10;
+plane3.position.z = 10;
+
+
 
 light2.position.y = -4
 light2.position.z = 3;
@@ -28,6 +42,19 @@ function App() {
     color: 0x0000FFFF
     //color: Math.random() * 0xFFFFFF | 0x000000FF
   });
+
+  // useEffect(() => {
+    // if (!camera) return;
+    // setInterval(() => {
+      // plane.normal.z += 0.05;
+      // if(plane.normal.z > 1){
+        // plane.normal.z = -1;
+      // }
+      // 
+      // console.log(plane.normal.z);
+      // camera.render();
+    // }, 200);
+  // }, [camera])
 
   useEffect(() => {
     if (!camera) return;

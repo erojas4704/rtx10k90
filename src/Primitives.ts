@@ -47,3 +47,30 @@ export class Sphere extends Primitive {
    return null;
   }
 }
+
+export class Plane extends Primitive {
+  public material: Material;
+  public rotation: Vector3 = new Vector3(0, 0, 1);
+
+  constructor(){
+    super();
+    this.material = new Material();
+    this.material.albedo = 0xFFFFFFFF;
+  }
+
+  hitTest(ray: Ray): Collision | null {
+    const epsilon = 1e-6;
+    const ndotu = Vector3.dot(this.rotation, ray.direction);
+
+    
+    if(Math.abs(ndotu) < epsilon){
+      return null;
+    }
+    const w = Vector3.subtract(this.position, ray.origin);
+    const si = Vector3.dot(this.rotation, w) / ndotu;
+    const psi = Vector3.add(w, Vector3.multiply(ray.direction, si), this.position);
+    const distance = Vector3.distance(ray.origin, psi);
+
+    return new Collision(this, psi, this.rotation, distance);
+  }
+}

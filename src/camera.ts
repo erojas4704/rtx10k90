@@ -80,11 +80,13 @@ export class Camera extends Entity {
             const normalToLight = Vector3.subtract(collision.point, light.position).normal;
             const dot = Vector3.dot(normalToLight, collision.normal);
             const distanceToLight = Vector3.distance(collision.point, light.position);
-            pR += r * dot;
-            pG += g * dot;
-            pB += b * dot;
+            const distanceScalar = Math.min(1, light.range / distanceToLight);
+            
+            pR += r * dot * distanceScalar;
+            pG += g * dot * distanceScalar;
+            pB += b * dot * distanceScalar;
           });
-          
+
           imageData.data[index] = this.clamp(pR, 0, 255);       
           imageData.data[index + 1] = this.clamp(pG, 0, 255);  
           imageData.data[index + 2] = this.clamp(pB, 0, 255);   
