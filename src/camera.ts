@@ -82,9 +82,12 @@ export class Camera extends Entity {
             const distanceToLight = Vector3.distance(collision.point, light.position);
             const distanceScalar = Math.min(1, light.range / distanceToLight);
             
-            pR += r * dot * distanceScalar;
-            pG += g * dot * distanceScalar;
-            pB += b * dot * distanceScalar;
+            pR += r * dot * distanceScalar + (r * material.specularity * light.r) ** 0.5;
+            pG += g * dot * distanceScalar + (g * material.specularity * light.g) ** 0.5;
+            pB += b * dot * distanceScalar + (b * material.specularity * light.b) ** 0.5;
+            // if(material.specularity > 0){
+              // console.log({pR, pG, pB});
+            // }
           });
 
           imageData.data[index] = this.clamp(pR, 0, 255);       

@@ -1,5 +1,6 @@
 export class Material {
     public albedo:number = 0xFF0000FF;
+    public specularity:number = 0;
 
     public get rgba(){
         const r = this.albedo >> 24 & 0xFF;

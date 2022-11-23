@@ -23,8 +23,6 @@ const plane3 = new Plane();
 plane3.position.y = -10;
 plane3.position.z = 10;
 
-
-
 light2.position.y = -4
 light2.position.z = 3;
 
