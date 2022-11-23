@@ -1,19 +1,23 @@
+import { Light } from "./Light";
 import { Primitive } from "./Primitives";
 import { Vector3 } from "./Vector3";
 
 export class Physics {
   private static primitives: Primitive[] = [];
+  public static lights: Light[] = [];
+
   public static linecast(
     origin: Vector3,
     direction: Vector3
   ): Collision | null {
     let closest: Collision | null = null;
 
+
     this.primitives.forEach((o) => {
-      //TODO Get the closest collision
       const c = o.hitTest(new Ray(origin, direction));
       if (c) {
-        closest = c;
+        if(!closest) closest = c;
+        else if(c.distance < closest.distance) closest = c;
       }
     });
     return closest;
@@ -33,8 +37,12 @@ export class Physics {
     return Vector3.multiply(Vector3.add(origin, direction), dot);
   }
 
-  public static register(o: Primitive) {
-    this.primitives.push(o);
+  public static register(o: Primitive | Light) {
+    if(o instanceof Primitive){
+      this.primitives.push(o);
+    }else if(o instanceof Light){
+      this.lights.push(o);
+    }
   }
 }
 

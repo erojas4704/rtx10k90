@@ -3,7 +3,7 @@
  */
 import { Entity } from "./entity";
 import { Material } from "./Material";
-import { Collision, Physics, Ray } from "./Physics";
+import { Physics, Ray } from "./Physics";
 import { Vector3 } from "./Vector3";
 
 export class Camera extends Entity {
@@ -72,21 +72,25 @@ export class Camera extends Entity {
         } else {
           const material:Material = collision.entity.material;
           const {r, g, b, a} = material.rgba;
+          let [pR, pG, pB] = [0, 0, 0];
 
-          if(y > this._resolution.y / 2 - 10 && y < this._resolution.y / 2 + 10 
-          && x > this._resolution.x / 2 - 10 && x < this._resolution.x / 2 + 10){
-            console.log(collision.distance, "THESE ARE FROM THE SAMPLINGS NEAR THE CENTER");
-            
-          }
-          if(y == this._resolution.y / 2 && x == this._resolution.x / 2){
-            console.log(collision.distance, 'THIS SHOULD BE SPHERE\'S Z MINUS RADIUS. THIS SHOULD BE THE LOWEST',this.position);
-            //SHOULD BE THE SPHERE'S X MINUS THE SPHERE'S RADIUS.
-          }
+          //Get the nearest light source for this test
+
+          Physics.lights.forEach(light => {
+            const normalToLight = Vector3.subtract(collision.point, light.position).normal;
+            const dot = Vector3.dot(normalToLight, collision.normal);
+            const distanceToLight = Vector3.distance(collision.point, light.position);
+            pR += r * dot;
+            pG += g * dot;
+            pB += b * dot;
+          });
+          
           
 
-          imageData.data[index] = 0xFF - Math.min(collision.distance / 3, 1) * 0xFF;
-          imageData.data[index + 1] = g;
-          imageData.data[index + 2] = b;
+          
+          imageData.data[index] = this.clamp(pR, 0, 255);       
+          imageData.data[index + 1] = this.clamp(pG, 0, 255);  
+          imageData.data[index + 2] = this.clamp(pB, 0, 255);   
           imageData.data[index + 3] = a;
         }
       }
@@ -96,5 +100,9 @@ export class Camera extends Entity {
     this.totalDelayMS += performance.now() - renderStartTime;
     this.delaySamples ++;
     this.averageDelayMS = this.totalDelayMS / this.delaySamples;
+  }
+
+  private clamp(value:number, min:number, max:number):number{
+    return Math.min(Math.max(value, min), max);
   }
 }

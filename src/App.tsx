@@ -5,8 +5,17 @@ import "./App.css";
 import { Camera } from "./camera";
 import { Vector3 } from "./Vector3";
 import { Sphere } from "./Primitives";
+import { Light } from "./Light";
 
 const sphere = new Sphere();
+const light = new Light();
+const light2 = new Light();
+
+light2.position.y = -4
+light2.position.z = 3;
+
+light.position.z = 1;
+light.position.x = 3;
 
 function App() {
   const canvas = useRef(null);
@@ -51,7 +60,8 @@ function App() {
     <div className="App">
       {/* <input type="range" min={1} max={10} onChange={} /> */}
       <div>Rendering took {String(camera? Math.floor(camera.averageDelayMS): "error")} MS</div>
-      <label htmlFor="x_pos">X:</label>
+      <form>
+      <label>X:
       <input
         id="x_pos"
         type="number"
@@ -64,7 +74,8 @@ function App() {
           })
         }
       />
-      <label htmlFor="y_pos">Y:</label>
+      </label>
+      <label>Y:
       <input
         id="y_pos"
         type="number"
@@ -77,7 +88,8 @@ function App() {
           })
         }
       />
-      <label htmlFor="z_pos">Z:</label>
+      </label>
+      <label>Z:
       <input
         id="z_pos"
         type="number"
@@ -90,7 +102,8 @@ function App() {
           })
         }
       />
-      <label htmlFor="radius">Radius:</label>
+      </label>
+      <label>Radius:
       <input
         id="radius"
         type="number"
@@ -105,6 +118,8 @@ function App() {
           })
         }
       />
+      </label>
+      </form>
       <canvas ref={canvas} width={550} height={400}></canvas>
     </div>
   );

@@ -32,7 +32,7 @@ export class Sphere extends Primitive {
     const discriminant = this.radius ** 2 - eoDot + v ** 2;
     const distance = v - Math.sqrt(discriminant);
 
-    const hitPosition = Vector3.multiply(ray.origin, distance);
+    const hitPosition = Vector3.add(ray.origin, Vector3.multiply(ray.direction, distance));
     const hitNormal = Vector3.subtract(this.position, hitPosition).normal;
     
     const dist = Vector3.distance(

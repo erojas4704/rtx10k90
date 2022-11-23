@@ -27,8 +27,6 @@ export class Vector3 {
       if(!prev) return curr;
       return new Vector3(prev.x + curr.x, prev.y + curr.y, prev.z + curr.z);
     });
-    
-    //return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
   }
 
   public static multiply(vector: Vector3, value: number): Vector3 {
