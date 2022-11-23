@@ -22,8 +22,13 @@ export class Vector3 {
     return new Vector3(this.x / mag, this.y / mag, this.z / mag);
   }
 
-  public static add(a: Vector3, b: Vector3): Vector3 {
-    return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+  public static add(...vectors:Vector3[]): Vector3 {
+    return vectors.reduce((prev:Vector3, curr:Vector3) => {
+      if(!prev) return curr;
+      return new Vector3(prev.x + curr.x, prev.y + curr.y, prev.z + curr.z);
+    });
+    
+    //return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
   }
 
   public static multiply(vector: Vector3, value: number): Vector3 {
@@ -56,6 +61,10 @@ export class Vector3 {
 
   public static get up() {
     return new Vector3(0, 1, 0);
+  }
+
+  public static get right() {
+    return new Vector3(1, 0, 0);
   }
 
   public get mag(): number {

@@ -10,7 +10,7 @@ export class Physics {
     let closest: Collision | null = null;
 
     this.primitives.forEach((o) => {
-      //Get the closest collision
+      //TODO Get the closest collision
       const c = o.hitTest(new Ray(origin, direction));
       if (c) {
         closest = c;
@@ -48,4 +48,16 @@ export class Ray {
   }
 }
 
-export class Collision {}
+export class Collision {
+  public point: Vector3;
+  public normal: Vector3;
+  public entity: Primitive;
+  public distance: number = 0;
+
+  constructor(entity:Primitive, point:Vector3, normal:Vector3, distance: number){
+    this.point = point;
+    this.normal = normal;
+    this.entity = entity;
+    this.distance = distance;
+  }
+}

@@ -1,4 +1,8 @@
+/**
+ * Reference: https://tmcw.github.io/literate-raytracer/
+ */
 import { Entity } from "./entity";
+import { Material } from "./Material";
 import { Collision, Physics, Ray } from "./Physics";
 import { Vector3 } from "./Vector3";
 
@@ -7,53 +11,38 @@ export class Camera extends Entity {
     x: 5,
     y: 2,
   };
-  private _hFov: number;
-  private _vFov: number;
+  private _fov: number;
   private _frustumDistance: number;
   private renderTarget: HTMLCanvasElement;
+
+  private delaySamples:number = 0;
+  private totalDelayMS:number = 0;
+  public averageDelayMS:number = 0;
 
   constructor(renderTarget: HTMLCanvasElement) {
     super();
     this.renderTarget = renderTarget;
     this._resolution.x = renderTarget.width;
     this._resolution.y = renderTarget.height;
-    this._hFov = 90;
-    this._vFov = 60;
+    this._fov = 90;
     this._frustumDistance = 1;
   }
 
-  public set hFov(value: number) {
-    this._hFov = value;
-  }
-  public set vFov(value: number) {
-    this._vFov = value;
+  public set fov(value: number) {
+    this._fov = value;
   }
 
   render() {
-    const frustumCenter: Vector3 = Vector3.add(
-      this.position,
-      Vector3.multiply(this.rotation, this._frustumDistance)
-    );
+    const fovRads = (this._fov * Math.PI) / 180;
+    const aspectRatio = this._resolution.y / this._resolution.x;
 
-    const frustumWidth = this.calculateFrustumLength(
-      this._hFov,
-      this._frustumDistance
-    );
-    const frustumHeight = this.calculateFrustumLength(
-      this._vFov,
-      this._frustumDistance
-    );
+    const frustumWidthHalf = Math.tan(fovRads) * this._frustumDistance;
+    const frustumHeightHalf = frustumWidthHalf * aspectRatio;
 
-    const viewNormal: Vector3 = Vector3.cross(this.rotation, Vector3.up).neg;
-    const topLeft: Vector3 = Vector3.add(
-      frustumCenter,
-      Vector3.add(viewNormal, Vector3.up).normalized
-    );
+    const pixelWidth = frustumWidthHalf * 2 / (this._resolution.x - 1);
+    const pixelHeight = frustumHeightHalf * 2 / (this._resolution.y - 1);
 
-    const bottomRight: Vector3 = Vector3.add(
-      frustumCenter,
-      Vector3.add(viewNormal, Vector3.up.neg).normalized
-    );
+    const renderStartTime = performance.now();
 
     const drawContext = this.renderTarget.getContext("2d");
     if (!drawContext) throw new Error("Invalid rendering context!");
@@ -62,23 +51,15 @@ export class Camera extends Entity {
 
     for (let y = 0; y < this._resolution.y; y++) {
       for (let x = 0; x < this._resolution.x; x++) {
-        const xScaled = (x * frustumWidth) / this._resolution.x;
-        const yScaled = (y * frustumHeight) / this._resolution.y;
+        const cameraRight:Vector3 = Vector3.cross(this.rotation, Vector3.right);
+        const cameraUp:Vector3 = Vector3.cross(this.rotation, Vector3.up);
 
+        const xScale = Vector3.multiply(cameraRight, x * pixelWidth - frustumWidthHalf);
+        const yScale = Vector3.multiply(cameraUp, y * pixelHeight - frustumHeightHalf);
 
-        const offset: Vector3 = new Vector3(
-          viewNormal.x * xScaled * frustumWidth,
-          frustumHeight * yScaled,
-          viewNormal.z * xScaled * frustumWidth
-        );
-        if(x == this._resolution.x / 2 && y == this._resolution.y / 2){
-          console.log("WHAT", {offset});
-          debugger;
-        }
-        const pixelWorldPosition: Vector3 = Vector3.add(topLeft, offset);
         const ray: Ray = new Ray(
           this.position,
-          Vector3.subtract(pixelWorldPosition, this.position).normalized
+          Vector3.add(this.rotation, xScale, yScale).normal
         );
 
         const index = (y * this._resolution.x + x) * 4;
@@ -89,22 +70,31 @@ export class Camera extends Entity {
           imageData.data[index + 2] = 0x00;
           imageData.data[index + 3] = 0xff;
         } else {
-          imageData.data[index] = 0xff;
-          imageData.data[index + 1] = 0x00;
-          imageData.data[index + 2] = 0x00;
-          imageData.data[index + 3] = 0xff;
+          const material:Material = collision.entity.material;
+          const {r, g, b, a} = material.rgba;
+
+          if(y > this._resolution.y / 2 - 10 && y < this._resolution.y / 2 + 10 
+          && x > this._resolution.x / 2 - 10 && x < this._resolution.x / 2 + 10){
+            console.log(collision.distance, "THESE ARE FROM THE SAMPLINGS NEAR THE CENTER");
+            
+          }
+          if(y == this._resolution.y / 2 && x == this._resolution.x / 2){
+            console.log(collision.distance, 'THIS SHOULD BE SPHERE\'S Z MINUS RADIUS. THIS SHOULD BE THE LOWEST',this.position);
+            //SHOULD BE THE SPHERE'S X MINUS THE SPHERE'S RADIUS.
+          }
+          
+
+          imageData.data[index] = 0xFF - Math.min(collision.distance / 3, 1) * 0xFF;
+          imageData.data[index + 1] = g;
+          imageData.data[index + 2] = b;
+          imageData.data[index + 3] = a;
         }
       }
     }
-
     drawContext.putImageData(imageData, 0, 0);
 
-    console.log("rendering");
-  }
-
-  private calculateFrustumLength(fov: number, distance: number): number {
-    const fovRads = (fov * Math.PI) / 180;
-    const h: number = distance / Math.cos(fovRads * 0.5);
-    return (h ** 2 - distance ** 2) * 2;
+    this.totalDelayMS += performance.now() - renderStartTime;
+    this.delaySamples ++;
+    this.averageDelayMS = this.totalDelayMS / this.delaySamples;
   }
 }

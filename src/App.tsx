@@ -4,26 +4,26 @@ import "./App.css";
 
 import { Camera } from "./camera";
 import { Vector3 } from "./Vector3";
-import { Circle, Sphere } from "./Primitives";
+import { Sphere } from "./Primitives";
 
 const sphere = new Sphere();
-const circle = new Circle();
 
 function App() {
   const canvas = useRef(null);
   const [camera, setCamera] = useState<Camera | null>();
   const [circleStats, setCircleStats] = useState({
-    x: 2.3,
-    y: -4.5,
+    x: 0,
+    y: 0,
     z: 5,
-    radius: 0.1,
+    radius: 3,
+    color: 0x0000FFFF
+    //color: Math.random() * 0xFFFFFF | 0x000000FF
   });
 
   useEffect(() => {
     if (!camera) return;
     camera.rotation = new Vector3(0, 0, 1);
-    camera.hFov = 60;
-    camera.vFov = 60;
+    camera.fov = 60;
 
     render();
   }, [camera]);
@@ -31,10 +31,11 @@ function App() {
   const render = () => {
     if (!camera) return;
 
-    circle.position.x = circleStats.x;
-    circle.position.y = circleStats.y;
-    circle.position.z = circleStats.z;
-    circle.radius = circleStats.radius;
+    sphere.position.x = circleStats.x;
+    sphere.position.y = circleStats.y;
+    sphere.position.z = circleStats.z;
+    sphere.radius = circleStats.radius;
+    sphere.material.albedo = circleStats.color;
     camera.render();
   };
 
@@ -49,6 +50,7 @@ function App() {
   return (
     <div className="App">
       {/* <input type="range" min={1} max={10} onChange={} /> */}
+      <div>Rendering took {String(camera? Math.floor(camera.averageDelayMS): "error")} MS</div>
       <label htmlFor="x_pos">X:</label>
       <input
         id="x_pos"
@@ -103,7 +105,7 @@ function App() {
           })
         }
       />
-      <canvas ref={canvas} width={1440} height={1080}></canvas>
+      <canvas ref={canvas} width={550} height={400}></canvas>
     </div>
   );
 }
