@@ -44,21 +44,20 @@ export class Camera extends Entity {
       this._frustumDistance
     );
 
-    const viewNormal: Vector3 = Vector3.cross(this.rotation, Vector3.up);
+    const viewNormal: Vector3 = Vector3.cross(this.rotation, Vector3.up).neg;
     const topLeft: Vector3 = Vector3.add(
       frustumCenter,
-      Vector3.add(viewNormal.neg, Vector3.up).normalized
+      Vector3.add(viewNormal, Vector3.up).normalized
     );
 
-    // const bottomRight: Vector3 = Vector3.add(
-    //   frustumCenter,
-    //   Vector3.add(viewNormal, Vector3.up.neg).normalized
-    // );
+    const bottomRight: Vector3 = Vector3.add(
+      frustumCenter,
+      Vector3.add(viewNormal, Vector3.up.neg).normalized
+    );
 
     const drawContext = this.renderTarget.getContext("2d");
     if (!drawContext) throw new Error("Invalid rendering context!");
 
-    //const imageData = drawContext.getImageData(0, 0, this._resolution.x, this._resolution.y);
     const imageData = new ImageData(this._resolution.x, this._resolution.y);
 
     for (let y = 0; y < this._resolution.y; y++) {
@@ -66,11 +65,16 @@ export class Camera extends Entity {
         const xScaled = (x * frustumWidth) / this._resolution.x;
         const yScaled = (y * frustumHeight) / this._resolution.y;
 
+
         const offset: Vector3 = new Vector3(
           viewNormal.x * xScaled * frustumWidth,
           frustumHeight * yScaled,
           viewNormal.z * xScaled * frustumWidth
         );
+        if(x == this._resolution.x / 2 && y == this._resolution.y / 2){
+          console.log("WHAT", {offset});
+          debugger;
+        }
         const pixelWorldPosition: Vector3 = Vector3.add(topLeft, offset);
         const ray: Ray = new Ray(
           this.position,
@@ -94,6 +98,8 @@ export class Camera extends Entity {
     }
 
     drawContext.putImageData(imageData, 0, 0);
+
+    console.log("rendering");
   }
 
   private calculateFrustumLength(fov: number, distance: number): number {

@@ -16,12 +16,12 @@ function App() {
     x: 2.3,
     y: -4.5,
     z: 5,
-    radius: 0.6,
+    radius: 0.1,
   });
 
   useEffect(() => {
     if (!camera) return;
-    camera.rotation = new Vector3(0, 0, -1);
+    camera.rotation = new Vector3(0, 0, 1);
     camera.hFov = 60;
     camera.vFov = 60;
 
