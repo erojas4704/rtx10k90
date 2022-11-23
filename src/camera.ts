@@ -85,9 +85,6 @@ export class Camera extends Entity {
             pB += b * dot;
           });
           
-          
-
-          
           imageData.data[index] = this.clamp(pR, 0, 255);       
           imageData.data[index + 1] = this.clamp(pG, 0, 255);  
           imageData.data[index + 2] = this.clamp(pB, 0, 255);   
